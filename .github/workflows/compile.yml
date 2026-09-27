@@ -1,0 +1,36 @@
+name: compile (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        description: "src folder"
+        required: false
+        type: string
+        default: "src"
+      python-versions:
+        description: "JSON-Array of Python-Versions, e.g. '[\"3.13\"]'"
+        required: false
+        type: string
+        default: '["3.14"]'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ${{ fromJson(inputs.python-versions) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Build plugins, python ${{ matrix.python }}
+        run: |
+          cd ${{ inputs.path }}
+          python -m compileall .

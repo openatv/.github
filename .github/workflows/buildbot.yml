@@ -1,0 +1,32 @@
+name: buildbot (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        type: string
+        default: "3.14"
+      ref:
+        required: false
+        type: string
+        default: "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Build python CI
+        run: |
+          sudo apt-get -q update
+          sudo apt-get install -y dos2unix gettext
+          pip install --upgrade pip autopep8
+          ./CI/build.sh
